@@ -24,7 +24,10 @@ public class PlayState extends State {
 	
 	private boolean showing;
 	private float timer;
+	//jfy
+	private int tileCounter;
 	float scoreTimer;
+	
 	
 	private Score score;
 	
@@ -136,7 +139,8 @@ public class PlayState extends State {
 	}
 	
 	private void createBoard(int numRows,int numCols){
-		tiles = new Tile[numRows][numCols];
+		//jfy: tiles = new Tile[numRows][numCols];
+		tiles = new Tile [3][3];
 		tileSize = Omo.WIDTH / tiles[0].length;
 		boardOffset = (Omo.HEIGHT - (tileSize * tiles.length)) / 2;
 
@@ -153,24 +157,25 @@ public class PlayState extends State {
 		}
 	}
 	
+	/****
+	 * jfy's checkShowing: to show the lit-up tiles one by one
+	 * @param dt
+	 */
 	private void checkShowing(float dt){
-		if(showing){
+		if(showing){		
 			timer+=dt;
-			if(timer>0.7){
-				if(timer%0.2f<0.1f){
+			if(timer > 5.5){      //jfy: the last tile has 0.9 to persist
+					timer = 0;
+					showing=false;
 					for(int i=0;i<finished.size;i++){
-						finished.get(i).toggleSelected();  
+						finished.get(i).setSelected(false);
 					}
-				}
-			}
-			if(timer>1.2){
-				showing=false;
-				for(int i=0;i<finished.size;i++){
-					finished.get(i).setSelected(false);
-				}
+			} else {
+				finished.get(Math.round(timer)).setSelected(true);		
 			}
 		}
 	}
+	
 	
 	private void createFinished(int numTilestoLight){
 		showing=true;
@@ -179,17 +184,21 @@ public class PlayState extends State {
 		selected.clear();
 		scoreTimer=5;
 		wrongTimer=0;
-		
-		for(int i=0;i<numTilestoLight;i++){
+		tileCounter=0;
+		///jfy: for(int i=0;i<numTilestoLight;i++){
+		for(int i=0;i<6;i++){
 			int row=0;
 			int col=0;
 			do{
 				row=MathUtils.random(tiles.length-1);
 				col=MathUtils.random(tiles[0].length-1);
+				//jfy
+				//finished.add(tiles[row][col]);
+				//tiles[row][col].setSelected(true);
 			}while(finished.contains(tiles[row][col], true));
 			finished.add(tiles[row][col]);
-			tiles[row][col].setSelected(true);
-		}
+			//jfy: tiles[row][col].setSelected(true);
+		}	
 	}
 	
 	private boolean isFinished(){
@@ -210,43 +219,16 @@ public class PlayState extends State {
 
 	@Override
 	public void hangInput() {
-
 		for(int i=0;i<MAX_FINGERs;i++){
 			if(!showing && !done && Gdx.input.isTouched(i)){
 				mouse.x=Gdx.input.getX(i);
 				mouse.y=Gdx.input.getY(i);
 				cam.unproject(mouse);
 				
-				for(Tile[] ts:tiles){
-					for(Tile t:ts){
-						if(t.contains(mouse.x, mouse.y)){
-							if(!t.isSelected()){
-								t.setSelected(true);
-								selected.add(t);
-								glows.add(new Glow(t.getX(), t.getY(), t.getWidth(), t.getHeight()));
-								if(isFinished()){
-									done=true;
-									level++;
-									int inc=(int)(scoreTimer*10);
-									int dec=5*(selected.size-finished.size);
-									for(int j=0;j<selected.size;j++){
-										Tile tile=selected.get(j);
-										if(!finished.contains(tile, true)){
-											tile.setWrong();
-										}
-									}
-									if(dec==0)
-										wrongTimer=1;
-									score.incrementScore(inc-dec);
-									
-									
-								}
-							}
-						}
-					}
-				}
-				
+				checkAnswer();
 			}
+			
+			//jfy Back button 
 			if(Gdx.input.justTouched()){
 				mouse.x=Gdx.input.getX(i);
 				mouse.y=Gdx.input.getY(i);
@@ -256,6 +238,54 @@ public class PlayState extends State {
 				}
 			}
 		}
+	}
+
+	private void checkAnswer() {
+		for(Tile[] ts:tiles){
+			for(Tile t:ts){
+				if(t.contains(mouse.x, mouse.y)){
+					if(!t.isSelected()){
+						t.setSelected(true);
+						selected.add(t);
+
+						//jfy
+						checkAgainstPuzzle();
+						//jfy
+						tileCounter += 1;
+						
+						if(isFinished()){  //jfy check if all puzzles lit up previously have been chosen
+							done=true;
+							level++;
+							int inc=(int)(scoreTimer*10);
+							int dec=5*(selected.size-finished.size);
+							for(int j=0;j<selected.size;j++){
+								Tile tile=selected.get(j);
+								if(!finished.contains(tile, true)){
+									tile.setWrong();
+								}
+							}
+							if(dec==0)
+								wrongTimer=1;
+							score.incrementScore(inc-dec);
+							
+							
+						}
+					}
+				}
+			}
+		}	
+	}
+
+	/**
+	 * jfy  
+	 */
+	private void checkAgainstPuzzle() {
+			Tile t = selected.get(tileCounter);
+			if (t == finished.get(tileCounter)){
+				glows.add(new Glow(t.getX(), t.getY(), t.getWidth(), t.getHeight()));
+			}else{
+				t.setWrong();
+			}
 	}
 
 	@Override
