@@ -48,7 +48,7 @@ public class TransitionState extends State{
 	}
 
 	@Override
-	public void hangInput() {
+	public void handleInput() {
 		// TODO Auto-generated method stub
 		
 	}

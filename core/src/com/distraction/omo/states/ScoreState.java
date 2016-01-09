@@ -15,7 +15,7 @@ public class ScoreState extends State{
 	}
 
 	@Override
-	public void hangInput() {
+	public void handleInput() {
 		if(Gdx.input.justTouched()){
 //			gsm.set(new MenuState(gsm));
 			gsm.set(new TransitionState(gsm, this, new MenuState(gsm), Type.BLACK_FADE));
@@ -24,7 +24,7 @@ public class ScoreState extends State{
 
 	@Override
 	public void update(float dt) {
-		hangInput();
+		handleInput();
 	}
 
 	@Override

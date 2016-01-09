@@ -14,7 +14,7 @@ public class Omo extends ApplicationAdapter {
 	
 	public static int WIDTH=480;
 	public static int HEIGHT=800;
-	public static String TITLE="Omo";
+	public static String TITLE="Omo"; 
 	public static Content res;
 	
 	SpriteBatch sb;

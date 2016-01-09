@@ -26,7 +26,7 @@ public class DifficultyStage extends State{
 	}
 
 	@Override
-	public void hangInput() {
+	public void handleInput() {
 		// TODO Auto-generated method stub
 		if(Gdx.input.justTouched()){
 			mouse.x=Gdx.input.getX();
@@ -46,7 +46,7 @@ public class DifficultyStage extends State{
 	@Override
 	public void update(float dt) {
 		// TODO Auto-generated method stub
-		hangInput();
+		handleInput();
 	}
 
 	@Override

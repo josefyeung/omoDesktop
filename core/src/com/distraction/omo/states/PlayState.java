@@ -26,11 +26,7 @@ public class PlayState extends State {
 	private float timer;
 	//jfy
 	private int tileCounter;
-	float scoreTimer;
-	
-	
-	private Score score;
-	
+		
 	private TextureRegion light;
 	private TextureRegion dark;
 	
@@ -63,7 +59,6 @@ public class PlayState extends State {
 		createBoard(args[0], args[1]);
 		createFinished(args[2]);
 		
-		score=new Score(Omo.WIDTH/2, Omo.HEIGHT-50);
 		light=Omo.res.getAtlas("pack").findRegion("light");
 		dark=Omo.res.getAtlas("pack").findRegion("dark");
 		back=new Graphic(Omo.res.getAtlas("pack").findRegion("back"), Omo.WIDTH/2, 100);
@@ -182,7 +177,6 @@ public class PlayState extends State {
 		timer=0;
 		finished.clear();
 		selected.clear();
-		scoreTimer=5;
 		wrongTimer=0;
 		tileCounter=0;
 		///jfy: for(int i=0;i<numTilestoLight;i++){
@@ -212,13 +206,12 @@ public class PlayState extends State {
 	}
 	
 	private void done() {
-//		gsm.set(new MenuState(gsm));
-//		gsm.set(new ScoreState(gsm, score.getScore()));
-		gsm.set(new TransitionState(gsm, this, new ScoreState(gsm, score.getScore()), Type.EXPAND));
+		gsm.set(new MenuState(gsm));
+		//jfy: gsm.set(new TransitionState(gsm, this, new ScoreState(gsm, score.getScore()), Type.EXPAND));
 	}
 
 	@Override
-	public void hangInput() {
+	public void handleInput() {
 		for(int i=0;i<MAX_FINGERs;i++){
 			if(!showing && !done && Gdx.input.isTouched(i)){
 				mouse.x=Gdx.input.getX(i);
@@ -256,19 +249,7 @@ public class PlayState extends State {
 						if(isFinished()){  //jfy check if all puzzles lit up previously have been chosen
 							done=true;
 							level++;
-							int inc=(int)(scoreTimer*10);
-							int dec=5*(selected.size-finished.size);
-							for(int j=0;j<selected.size;j++){
-								Tile tile=selected.get(j);
-								if(!finished.contains(tile, true)){
-									tile.setWrong();
-								}
-							}
-							if(dec==0)
-								wrongTimer=1;
-							score.incrementScore(inc-dec);
-							
-							
+														
 						}
 					}
 				}
@@ -285,18 +266,16 @@ public class PlayState extends State {
 				glows.add(new Glow(t.getX(), t.getY(), t.getWidth(), t.getHeight()));
 			}else{
 				t.setWrong();
+				selected.removeIndex(tileCounter);
+				tileCounter -= 1;
 			}
 	}
 
 	@Override
 	public void update(float dt) {
 
-		hangInput();
+		handleInput();
 		checkShowing(dt);
-		
-		if(!showing){
-			scoreTimer-=dt;
-		}
 		
 		if(done){
 			wrongTimer+=dt;
@@ -341,8 +320,6 @@ public class PlayState extends State {
 			}
 		}
 	
-		score.render(sb);
-		
 		for (int row = 0; row < tiles.length; row++) {
 			for (int col = 0; col < tiles[0].length; col++) {
 				tiles[row][col].render(sb);
@@ -355,3 +332,5 @@ public class PlayState extends State {
 	}
 
 }
+
+
