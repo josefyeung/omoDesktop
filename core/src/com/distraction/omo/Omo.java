@@ -20,6 +20,9 @@ public class Omo extends ApplicationAdapter {
 	SpriteBatch sb;
 	GSM gsm;
 	
+	
+   
+	
 	@Override
 	public void create () {
 		

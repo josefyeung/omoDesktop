@@ -1,6 +1,8 @@
 package com.distraction.omo.states;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -56,8 +58,8 @@ public class PlayState extends State {
 	
 	boolean done;
 	
-	private Graphic back;
-
+	private Graphic back;	
+	
 	public PlayState(GSM gsm,Difficulty df) {
 		super(gsm);
 		this.difficulty=df;
@@ -76,6 +78,12 @@ public class PlayState extends State {
 		glows=new Array<Glow>();
 	}
 	
+	private void readOutLoud() {
+		//jfy prepare the words to read pout loud
+      	Sound readWord = gsm.assets.get("sounds/asubuhi0.mp3", Sound.class);
+        readWord.play();
+	}
+
 	private int[] getArgs(){
 		int[] res=new int[3];
 		if(difficulty==Difficulty.EASY){
@@ -288,6 +296,7 @@ public class PlayState extends State {
 			Tile t = selected.get(tileCounter);
 			if (t == finished.get(tileCounter)){
 				glows.add(new Glow(t.getX(), t.getY(), t.getWidth(), t.getHeight()));
+				readOutLoud();
 			}else{
 				t.setWrong();
 			}
@@ -362,6 +371,6 @@ public class PlayState extends State {
 		//gsm.font.draw(sb, "English!", 100, 100);
         gsm.font24.draw(sb, "English", 200, 250);
         
-		sb.end();
+      	sb.end();
 	}	
 }
