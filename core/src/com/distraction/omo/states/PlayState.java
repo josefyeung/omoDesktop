@@ -164,7 +164,7 @@ public class PlayState extends State {
 	private void checkShowing(float dt){
 		if(showing){		
 			timer+=dt;
-			if(timer > 5.5){      //jfy: the last tile has 0.9 to persist
+			if(timer >  2.5f){      //jfy: the last tile has 0.5 to persist
 					timer = 0;
 					showing=false;
 					for(int i=0;i<finished.size;i++){
@@ -184,9 +184,10 @@ public class PlayState extends State {
 		selected.clear();
 		scoreTimer=5;
 		wrongTimer=0;
+		//jfy
 		tileCounter=0;
-		///jfy: for(int i=0;i<numTilestoLight;i++){
-		for(int i=0;i<6;i++){
+		for(int i=0;i<3;i++){
+		//jfy for(int i=0;i<numTilestoLight;i++){
 			int row=0;
 			int col=0;
 			do{
@@ -220,7 +221,8 @@ public class PlayState extends State {
 	@Override
 	public void hangInput() {
 		for(int i=0;i<MAX_FINGERs;i++){
-			if(!showing && !done && Gdx.input.isTouched(i)){
+			if(!showing && !done && Gdx.input.justTouched()){
+			//jfy: if(!showing && !done && Gdx.input.isTouched(i)){
 				mouse.x=Gdx.input.getX(i);
 				mouse.y=Gdx.input.getY(i);
 				cam.unproject(mouse);
@@ -244,14 +246,14 @@ public class PlayState extends State {
 		for(Tile[] ts:tiles){
 			for(Tile t:ts){
 				if(t.contains(mouse.x, mouse.y)){
-					if(!t.isSelected()){
+					//jfy if(!t.isSelected()){
 						t.setSelected(true);
 						selected.add(t);
 
 						//jfy
 						checkAgainstPuzzle();
 						//jfy
-						tileCounter += 1;
+						tileCounter ++;
 						
 						if(isFinished()){  //jfy check if all puzzles lit up previously have been chosen
 							done=true;
@@ -266,11 +268,10 @@ public class PlayState extends State {
 							}
 							if(dec==0)
 								wrongTimer=1;
-							score.incrementScore(inc-dec);
-							
-							
+							score.incrementScore(inc-dec);		
 						}
-					}
+
+					//}
 				}
 			}
 		}	
@@ -283,8 +284,21 @@ public class PlayState extends State {
 			Tile t = selected.get(tileCounter);
 			if (t == finished.get(tileCounter)){
 				glows.add(new Glow(t.getX(), t.getY(), t.getWidth(), t.getHeight()));
+			
+				/** jfy
+				for(Tile[] ts:tiles){
+					for(Tile tile:ts){
+					   if (tile.isWrong()){
+						   tile.setWrong(false);
+					   }
+					}					
+				}
+				**/
 			}else{
+				
+				selected.removeIndex(tileCounter);
 				t.setWrong();
+				tileCounter -= 1;
 			}
 	}
 
