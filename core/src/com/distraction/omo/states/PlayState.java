@@ -1,6 +1,8 @@
 package com.distraction.omo.states;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
@@ -14,6 +16,10 @@ import com.distraction.omo.ui.Tile;
 
 public class PlayState extends State {
 
+	//jfy to copy the font drawing from 15Slidez
+	public BitmapFont font24;
+	
+	
 	private Tile[][] tiles;
 	private int tileSize;
 	float boardOffset;
@@ -27,7 +33,6 @@ public class PlayState extends State {
 	//jfy
 	private int tileCounter;
 	float scoreTimer;
-	
 	
 	private Score score;
 	
@@ -347,6 +352,9 @@ public class PlayState extends State {
 		sb.begin();
 		back.render(sb);
 		
+		//jfy
+        gsm.font.draw(sb, "Swahili!!! ", 100, 150);
+        
 		for(int i=0;i<maxLevel;i++){
 			if(i<level){
 				sb.draw(light, Omo.WIDTH/2-(2*maxLevel-1)*10/2+20*i, Omo.HEIGHT-100,10,10);
@@ -365,7 +373,9 @@ public class PlayState extends State {
 		for(int i=0;i<glows.size;i++){
 			glows.get(i).render(sb);
 		}
+		//gsm.font.draw(sb, "English!", 100, 100);
+        gsm.font24.draw(sb, "English", 200, 250);
+        
 		sb.end();
-	}
-
+	}	
 }
