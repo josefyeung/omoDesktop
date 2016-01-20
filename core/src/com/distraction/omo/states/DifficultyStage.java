@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
 import com.distraction.omo.Omo;
-import com.distraction.omo.states.PlayState.Difficulty;
 import com.distraction.omo.ui.Graphic;
 import com.distraction.omo.ui.TextImage;
 
@@ -26,7 +25,7 @@ public class DifficultyStage extends State{
 	}
 
 	@Override
-	public void hangInput() {
+	public void handleInput() {
 		// TODO Auto-generated method stub
 		if(Gdx.input.justTouched()){
 			mouse.x=Gdx.input.getX();
@@ -34,7 +33,7 @@ public class DifficultyStage extends State{
 			cam.unproject(mouse);
 			for(int i=0;i<buttons.size;i++){
 				if(buttons.get(i).contains(mouse.x, mouse.y)){
-					gsm.set(new PlayState(gsm, Difficulty.values()[i]));
+					gsm.set(new PlayState(gsm));
 				}
 			}
 			if(back.contains(mouse.x,  mouse.y)){
@@ -46,7 +45,7 @@ public class DifficultyStage extends State{
 	@Override
 	public void update(float dt) {
 		// TODO Auto-generated method stub
-		hangInput();
+		handleInput();
 	}
 
 	@Override

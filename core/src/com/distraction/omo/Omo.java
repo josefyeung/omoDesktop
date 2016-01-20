@@ -8,7 +8,6 @@ import com.distraction.omo.handler.Content;
 import com.distraction.omo.states.GSM;
 import com.distraction.omo.states.MenuState;
 import com.distraction.omo.states.PlayState;
-import com.distraction.omo.states.PlayState.Difficulty;
 
 public class Omo extends ApplicationAdapter {
 	

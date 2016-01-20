@@ -19,7 +19,6 @@ public class PlayState extends State {
 	//jfy to copy the font drawing from 15Slidez
 	public BitmapFont font24;
 	
-	
 	private Tile[][] tiles;
 	private int tileSize;
 	float boardOffset;
@@ -30,43 +29,38 @@ public class PlayState extends State {
 	
 	private boolean showing;
 	private float timer;
-	//jfy
-	private int tileCounter;
-	float scoreTimer;
 	
+	//jfy
+	int tileCounter;
+	int numTilesToLight;
+	String[] puzzleStrings; 
+	
+	float scoreTimer;
 	private Score score;
 	
 	private TextureRegion light;
 	private TextureRegion dark;
 	
-	public enum Difficulty{
-		EASY,
-		NORMAL,
-		HARD,
-		INSANE
-	}
-	
 	int level;
 	int maxLevel;
-	Difficulty difficulty;
-	int[] args;
-	private Array<Glow> glows;
 	
+	private Array<Glow> glows;
 	private float wrongTimer;
 	
 	boolean done;
 	
 	private Graphic back;
 
-	public PlayState(GSM gsm,Difficulty df) {
+	public PlayState(GSM gsm) {
 		super(gsm);
-		this.difficulty=df;
 		level=1;
+		maxLevel = gsm.wordList.size();
 		finished=new Array<Tile>();
 		selected=new Array<Tile>();
-		args=getArgs();
-		createBoard(args[0], args[1]);
-		createFinished(args[2]);
+		
+		createBoard(3, 3);
+		formPuzzle(level);
+		createPuzzleTiles(numTilesToLight);
 		
 		score=new Score(Omo.WIDTH/2, Omo.HEIGHT-50);
 		light=Omo.res.getAtlas("pack").findRegion("light");
@@ -76,73 +70,15 @@ public class PlayState extends State {
 		glows=new Array<Glow>();
 	}
 	
-	private int[] getArgs(){
-		int[] res=new int[3];
-		if(difficulty==Difficulty.EASY){
-			res[0]=3;
-			res[1]=3;
-			if(level>=1&&level<=3){
-				res[2]=3;
-			}
-			if(level==4||level==5){
-				res[2]=4;
-			}
-			maxLevel=5;
-		}
-		if(difficulty==Difficulty.NORMAL){
-			res[0]=4;
-			res[1]=4;
-			if(level==1||level==2){
-				res[2]=4;
-			}
-			if(level==3||level==4){
-				res[2]=5;
-			}
-			if(level==5||level==6){
-				res[2]=6;
-			}
-			maxLevel=6;
-		}
-		if(difficulty==Difficulty.HARD){
-			res[0]=5;
-			res[1]=5;
-			if(level==1||level==2){
-				res[2]=6;
-			}
-			if(level==3||level==4){
-				res[2]=7;
-			}
-			if(level==5||level==6){
-				res[2]=8;
-			}
-			if(level==7||level==8){
-				res[2]=9;
-			}
-			maxLevel=8;
-		}
-		if(difficulty==Difficulty.INSANE){
-			res[0]=6;
-			res[1]=6;
-			if(level==1||level==2){
-				res[2]=7;
-			}
-			if(level==3||level==4){
-				res[2]=8;
-			}
-			if(level==5||level==6){
-				res[2]=9;
-			}
-			if(level==7||level==8){
-				res[2]=10;
-			}
-			if(level==9||level==10){
-				res[2]=11;
-			}
-			maxLevel=10;
-		}
-		return res;
+	private void formPuzzle(int level) {
+		String s = gsm.wordList.get(level);
+        puzzleStrings = s.split("/");
+        numTilesToLight = puzzleStrings.length-1;  //jfy: as the first slice is the word/sentence 
+        System.out.println("Tiles:" + numTilesToLight);
+        for (int i=1; i<numTilesToLight+1 ; i++)
+            System.out.println("The pieces:" + puzzleStrings[i]);
 	}
-	
+
 	private void createBoard(int numRows,int numCols){
 		//jfy: tiles = new Tile[numRows][numCols];
 		tiles = new Tile [3][3];
@@ -164,12 +100,14 @@ public class PlayState extends State {
 	
 	/****
 	 * jfy's checkShowing: to show the lit-up tiles one by one
+	 * This part doesn't make sense; need refactoring
+	 * 
 	 * @param dt
 	 */
-	private void checkShowing(float dt){
+	private void lightUpTiles(float dt){
 		if(showing){		
 			timer+=dt;
-			if(timer >  2.5f){      //jfy: the last tile has 0.5 to persist
+			if(timer >  numTilesToLight - 0.5f){      //jfy: why? need refactoring
 					timer = 0;
 					showing=false;
 					for(int i=0;i<finished.size;i++){
@@ -182,7 +120,7 @@ public class PlayState extends State {
 	}
 	
 	
-	private void createFinished(int numTilestoLight){
+	private void createPuzzleTiles(int numTilestoLight){
 		showing=true;
 		timer=0;
 		finished.clear();
@@ -191,19 +129,17 @@ public class PlayState extends State {
 		wrongTimer=0;
 		//jfy
 		tileCounter=0;
-		for(int i=0;i<3;i++){
+		for(int i=0;i<numTilestoLight;i++){
 		//jfy for(int i=0;i<numTilestoLight;i++){
 			int row=0;
 			int col=0;
 			do{
 				row=MathUtils.random(tiles.length-1);
 				col=MathUtils.random(tiles[0].length-1);
-				//jfy
-				//finished.add(tiles[row][col]);
-				//tiles[row][col].setSelected(true);
 			}while(finished.contains(tiles[row][col], true));
 			finished.add(tiles[row][col]);
-			//jfy: tiles[row][col].setSelected(true);
+			//jfy
+			tiles[row][col].setText(puzzleStrings[i+1]);			
 		}	
 	}
 	
@@ -217,14 +153,14 @@ public class PlayState extends State {
 		return true;
 	}
 	
-	private void done() {
+	private void transit() {
 //		gsm.set(new MenuState(gsm));
 //		gsm.set(new ScoreState(gsm, score.getScore()));
 		gsm.set(new TransitionState(gsm, this, new ScoreState(gsm, score.getScore()), Type.EXPAND));
 	}
 
 	@Override
-	public void hangInput() {
+	public void handleInput() {
 		for(int i=0;i<MAX_FINGERs;i++){
 			if(!showing && !done && Gdx.input.justTouched()){
 			//jfy: if(!showing && !done && Gdx.input.isTouched(i)){
@@ -260,7 +196,7 @@ public class PlayState extends State {
 						//jfy
 						tileCounter ++;
 						
-						if(isFinished()){  //jfy check if all puzzles lit up previously have been chosen
+						if(isFinished()){  //jfy check if all puzzles lit up have been chosen
 							done=true;
 							level++;
 							int inc=(int)(scoreTimer*10);
@@ -290,15 +226,6 @@ public class PlayState extends State {
 			if (t == finished.get(tileCounter)){
 				glows.add(new Glow(t.getX(), t.getY(), t.getWidth(), t.getHeight()));
 			
-				/** jfy
-				for(Tile[] ts:tiles){
-					for(Tile tile:ts){
-					   if (tile.isWrong()){
-						   tile.setWrong(false);
-					   }
-					}					
-				}
-				**/
 			}else{
 				
 				selected.removeIndex(tileCounter);
@@ -310,23 +237,25 @@ public class PlayState extends State {
 	@Override
 	public void update(float dt) {
 
-		hangInput();
-		checkShowing(dt);
+		handleInput();
+		lightUpTiles(dt);
 		
 		if(!showing){
 			scoreTimer-=dt;
 		}
 		
 		if(done){
+			
+			if(level == maxLevel){
+				transit();
+			}
+			
 			wrongTimer+=dt;
 			if(wrongTimer>=1 && glows.size==0){
-				args=getArgs();
-				createBoard(args[0],args[1]);
-				createFinished(args[2]);
+				createBoard(3,3);
+				formPuzzle(level);
+				createPuzzleTiles(numTilesToLight);
 				done=false;
-				if(level>maxLevel ){
-					done();
-				}
 			}
 		}
 		
@@ -352,9 +281,6 @@ public class PlayState extends State {
 		sb.begin();
 		back.render(sb);
 		
-		//jfy
-        gsm.font.draw(sb, "Swahili!!! ", 100, 150);
-        
 		for(int i=0;i<maxLevel;i++){
 			if(i<level){
 				sb.draw(light, Omo.WIDTH/2-(2*maxLevel-1)*10/2+20*i, Omo.HEIGHT-100,10,10);
@@ -368,14 +294,24 @@ public class PlayState extends State {
 		for (int row = 0; row < tiles.length; row++) {
 			for (int col = 0; col < tiles[0].length; col++) {
 				tiles[row][col].render(sb);
+			
+				//jfy: see if the tile contains letter(s)
+				String t = tiles[row][col].getText(); 
+				if (t !=null){
+					gsm.font24.draw(sb, t, tiles[row][col].getX(), tiles[row][col].getY());
+				}
 			}
 		}
 		for(int i=0;i<glows.size;i++){
 			glows.get(i).render(sb);
 		}
-		//gsm.font.draw(sb, "English!", 100, 100);
-        gsm.font24.draw(sb, "English", 200, 250);
-        
+		
+		//jfy
+        //gsm.font.draw(sb, "Swahili!!! ", 100, 150);
+        //gsm.font24.draw(sb, "English", 200, 250);
+		
 		sb.end();
+		
+		
 	}	
 }

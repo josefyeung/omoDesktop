@@ -1,5 +1,6 @@
 package com.distraction.omo.states;
 
+import java.util.ArrayList;
 import java.util.Stack;
 
 import com.badlogic.gdx.Gdx;
@@ -14,7 +15,9 @@ public class GSM {
 	//jfy
     public BitmapFont font;
     public BitmapFont font24;
-	
+
+    public ArrayList<String> wordList; 
+    
 	public GSM() {
 		// TODO Auto-generated constructor stub
 		states=new Stack<State>();
@@ -22,8 +25,19 @@ public class GSM {
 		//jfy: Use LibGDX's default Arial font.
         font = new BitmapFont();
         initFonts(); 
+        initWordlist();
 	}
 	
+	private void initWordlist() {
+		wordList = new ArrayList<String>();
+		wordList.add("na/n/a");
+		wordList.add("nu/n/u");
+		wordList.add("mtini/m/tin/i");
+		wordList.add("anataka/a/na/taka");
+		wordList.add("anataka/a/na/ta/ka");
+		wordList.add("Tai mkuu anataka kukaa na kuku./Tai/mkuu/anataka/kukaa/na/kuku");
+	}
+
 	private void initFonts() {
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Arcon.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter params = new FreeTypeFontGenerator.FreeTypeFontParameter();

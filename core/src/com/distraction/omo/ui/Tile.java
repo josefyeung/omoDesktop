@@ -19,6 +19,9 @@ public class Tile extends Box{
 	
 	private boolean wrong;
 	
+	//jfy
+	private String puzzleTile;
+	
 	public Tile(float x,float y,float width,float height) {
 		// TODO Auto-generated constructor stub
 		this.x=x;
@@ -75,5 +78,14 @@ public class Tile extends Box{
 		// TODO Auto-generated method stub
 		selected=!selected;
 	}
+	//jfy
+	public void setText (String puzzleTile){
+		this.puzzleTile = puzzleTile;
+	}
+	//jfy
+	public String getText(){
+		return puzzleTile;
+	}
+	
 	
 }
